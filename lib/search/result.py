@@ -27,9 +27,19 @@ class SearchResult(object):
         self.full_citation = json['fullCitation']
         self.normalized_score = int(json['normalizedScore'])
         self.score = float(json['score'])
-        self.title = self.__clean_html(json['title']).strip().title()
+        self.title = self.format_title(json['title'])
         # set year to 0 if unknown
         self.year = 0 if json['year'] is None else int(json['year'])
+
+    def format_title(self, title):
+        def repl_func(m):
+            """
+            Process regular expression match groups for word upper-casing problem
+            Credits: http://stackoverflow.com/a/1549983/434227
+            """
+            return m.group(1) + m.group(2).upper()
+        title = self.__clean_html(title).strip()#.title() 
+        return re.sub("(^|\s)(\S)", repl_func, title)
 
     def get_doi(self):
         return self.doi
@@ -58,5 +68,3 @@ class SearchResult(object):
     def __clean_html(self, raw_html):
         regex = re.compile('<.*?>')
         return re.sub(regex,'',raw_html)
-
-
