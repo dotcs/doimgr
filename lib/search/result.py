@@ -66,5 +66,5 @@ class SearchResult(object):
         return self.doi.get_identifier()
 
     def __clean_html(self, raw_html):
-        regex = re.compile('<.*?>')
-        return re.sub(regex,'',raw_html)
+        regex = re.compile(r'<(.*?)>(.*?)</\1>')
+        return re.sub(regex, r"\2", raw_html)

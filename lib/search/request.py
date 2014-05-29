@@ -4,6 +4,7 @@ import json
 import urllib.parse
 import httplib2
 import logging
+import re
 
 from lib.search.result import SearchResult
 from lib.doi import DOI
@@ -73,4 +74,8 @@ script cannot deal with. Aborting.".format(status))
         return content.decode('utf-8')
 
     def print_citation(self, content):
-        print(content)
+        print(self.__clean_html(content))
+
+    def __clean_html(self, raw_html):
+        regex = re.compile(r'<(.*?)>(.*?)</\1>')
+        return re.sub(regex, r"\2", raw_html)
