@@ -38,7 +38,7 @@ class SearchResult(object):
             Credits: http://stackoverflow.com/a/1549983/434227
             """
             return m.group(1) + m.group(2).upper()
-        title = self.__clean_html(title).strip()#.title() 
+        title = self.__clean_html(title).strip()
         return re.sub("(^|\s)(\S)", repl_func, title)
 
     def get_doi(self):
