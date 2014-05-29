@@ -16,18 +16,24 @@ class Request(object):
 
     """
     URL_PROTOCOL = "http"
-    URL_SERVICE_DOIS = "search.crossref.org/dois"
+    URL_SERVICE_DOIS = "api.crossref.org/works"
     URL_SERVICE_CITATION = "search.crossref.org/citation"
 
     def __init__(self):
         pass
 
-    def prepare_search_query(self, string, sort, year, type):
-        payload = {'q': string, 'sort': sort}
+    def prepare_search_query(self, string, sort, order, year, type, rows):
+        filters = []
+        payload = {'query': string, 'sort': sort, 'order': order, 'rows': rows}
         if year is not None:
-            payload['year'] = year
+            filters.append(('from-pub-date', year))
         if type is not None:
-            payload['type'] = type
+            filters.append(('type', type))
+
+        # load all filter values
+        payload['filter'] = ','.join(['{}:{}'.format(key, value) for key, value\
+            in filters])
+
         return urllib.parse.urlencode(payload)
 
     def prepare_citation_query(self, doi_identifier, cite_format):
@@ -47,17 +53,23 @@ class Request(object):
         request_status = int(resp['status'])
         if request_status != 200:
             raise RuntimeError("The server responded with code {:d}, which the \
-script cannot deal with. Aborting.".format(status))
+script cannot deal with. Aborting.".format(request_status))
 
         return content.decode('utf-8')
 
-    def print_search_content(self, content):
+    def print_search_content(self, content, show_authors):
         json_content = json.loads(content)
-        for result in json_content:
+        for result in json_content['message']['items']:
             sr = SearchResult(result)
-            print("{:3d} - {:4d} - {:40} - {}". \
-                    format(sr.get_normalized_score(), sr.get_year(), \
-                    sr.get_doi().get_identifier(), sr.get_title()))
+            if show_authors:
+                print("{:.2f} - {:4d} - {:40} - {}\n\t{}\n". \
+                        format(sr.get_score(), sr.get_year(), \
+                        sr.get_doi().get_identifier(), sr.get_title(), sr.get_authors()))
+            else:
+                print("{:.2f} - {:4d} - {:40} - {}". \
+                        format(sr.get_score(), sr.get_year(), \
+                        sr.get_doi().get_identifier(), sr.get_title()))
+
 
     def citation(self, query):
         url = "{}://{}?{}".format(self.URL_PROTOCOL, self.URL_SERVICE_CITATION, query)
@@ -69,7 +81,7 @@ script cannot deal with. Aborting.".format(status))
         request_status = int(resp['status'])
         if request_status != 200:
             raise RuntimeError("The server responded with code {:d}, which the \
-script cannot deal with. Aborting.".format(status))
+script cannot deal with. Aborting.".format(request_status))
 
         return content.decode('utf-8')
 

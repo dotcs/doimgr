@@ -16,12 +16,43 @@ it to BibTex entries.')
     parser_search = subparsers.add_parser('search', help='Search database for \
 a published article to find the relevant DOI')
     parser_search.add_argument('query', type=str, help='search string')
-    parser_search.add_argument('--sort', type=str, default='score', choices=['score', \
-        'year'], help='sorting of search queries')
+    parser_search.add_argument('--show-authors', action='store_true', help='if \
+            set additional author information is shown')
+    parser_search.add_argument('--sort', type=str, default='score', \
+            choices=['score', 'updated', 'deposited', 'indexed', 'published'], \
+            help='sorting of search queries')
+    parser_search.add_argument('--order', type=str, default='desc', \
+            choices=['asc', 'desc'], help='ordering of search queries')
     parser_search.add_argument('--year', type=int, help='limit the year')
-    parser_search.add_argument('--type', type=str, choices=['article', \
-        'chapter', 'component', 'conference', 'dataset', 'report', 'component',\
-        'book', 'entry', 'monograph', 'other'], help='limit the type')
+    parser_search.add_argument('--rows', type=int, default=20, help='number of \
+rows to load')
+    # receive allowed types via http://api.crossref.org/types
+    parser_search.add_argument('--type', type=str, choices=[
+        'book',
+        'book-chapter',
+        'book-entry',
+        'book-part',
+        'book-section',
+        'book-series',
+        'book-set',
+        'book-track',
+        'component',
+        'dataset',
+        'dissertation',
+        'edited-book',
+        'journal',
+        'journal-article',
+        'journal-issue',
+        'journal-volume',
+        'monograph',
+        'other',
+        'proceedings',
+        'proceedings-article',
+        'reference-book',
+        'report',
+        'standard',
+        'standard-series',
+        ], help='limit the type')
 
     parser_doi = subparsers.add_parser('cite', help='Cite article based on \
 DOI in different citation formats')
@@ -51,8 +82,8 @@ all unnecessary outputs; use this for scripting')
         logging.debug('Arguments match to perform search')
         req = Request()
         results = req.search(req.prepare_search_query(args.query, args.sort, \
-            args.year, args.type))
-        req.print_search_content(results)
+            args.order, args.year, args.type, args.rows))
+        req.print_search_content(results, args.show_authors)
 
     if hasattr(args, 'identifier'):
         logging.debug('Arguments match to request single DOI')
