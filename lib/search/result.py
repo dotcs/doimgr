@@ -26,7 +26,8 @@ class SearchResult(object):
         self.score = float(json['score'])
         self.title = self.format_title(json['title'][0])
         # set year to 0 if unknown
-        self.timestamp = float(json['deposited']['timestamp'])/1000.
+        #self.timestamp = float(json['deposited']['timestamp'])/1000.
+        self.year= int(json['issued']['date-parts'][0][0])
         try:
             self.authors = self.__format_authors(json['author'])
         except KeyError:
@@ -52,7 +53,8 @@ class SearchResult(object):
         return self.title
 
     def get_year(self):
-        return datetime.fromtimestamp(self.timestamp).year
+        #return datetime.fromtimestamp(self.timestamp).year
+        return self.year
 
     def get_authors(self):
         return self.authors
