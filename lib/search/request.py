@@ -21,8 +21,12 @@ class Request(object):
     def __init__(self):
         pass
 
-    def prepare_search_query(self, string, sort):
+    def prepare_search_query(self, string, sort, year, type):
         payload = {'q': string, 'sort': sort}
+        if year is not None:
+            payload['year'] = year
+        if type is not None:
+            payload['type'] = type
         return urllib.parse.urlencode(payload)
 
     def prepare_citation_query(self, doi_identifier, cite_format):
@@ -50,7 +54,8 @@ script cannot deal with. Aborting.".format(status))
         json_content = json.loads(content)
         for result in json_content:
             sr = SearchResult(result)
-            print("{:3d} - {:40} - {}".format(sr.get_normalized_score(), \
+            print("{:3d} - {:4d} - {:40} - {}". \
+                    format(sr.get_normalized_score(), sr.get_year(), \
                     sr.get_doi().get_identifier(), sr.get_title()))
 
     def citation(self, query):

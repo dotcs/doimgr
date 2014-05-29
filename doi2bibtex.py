@@ -1,13 +1,10 @@
 #!/usr/bin/env python
-
 import os
 import sys
 import argparse
 import logging
 
 from lib.search.request import Request
-
-logging.basicConfig(level=logging.DEBUG)
 
 def main(argv):
     parser = argparse.ArgumentParser(
@@ -21,21 +18,40 @@ a published article to find the relevant DOI')
     parser_search.add_argument('query', type=str, help='search string')
     parser_search.add_argument('--sort', type=str, default='score', choices=['score', \
         'year'], help='sorting of search queries')
+    parser_search.add_argument('--year', type=int, help='limit the year')
+    parser_search.add_argument('--type', type=str, choices=['article', \
+        'chapter', 'component', 'conference', 'dataset', 'report', 'component',\
+        'book', 'entry', 'monograph', 'other'], help='limit the type')
 
-    parser_doi = subparsers.add_parser('doi', help='Use DOI to request \
-specific data format like BibTex')
+    parser_doi = subparsers.add_parser('cite', help='Cite article based on \
+DOI in different citation formats')
     parser_doi.add_argument('identifier', type=str, help='DOI identifier')
     parser_doi.add_argument('-f', '--format', type=str, default='bibtex', \
             choices=['bibtex', 'ris', 'apa', 'harvard', 'ieee', 'mla', \
             'vancouver', 'chicago'], help='output format when searching for a \
 specific DOI')
 
+    parser.add_argument('-q', '--quiet', action='store_true', help='turns off \
+all unnecessary outputs; use this for scripting')
+    parser.add_argument('--log-level', type=str, choices=['info', 'debug'], \
+            default='info', help='set the logging level')
+
     args = parser.parse_args()
+
+    # set the logging levels according to the users choice
+    if args.quiet:
+        level = logging.CRITICAL
+    else:
+        level = logging.INFO
+        if args.log_level == 'debug':
+            level = logging.DEBUG
+    logging.basicConfig(level=level)
 
     if hasattr(args, 'query'):
         logging.debug('Arguments match to perform search')
         req = Request()
-        results = req.search(req.prepare_search_query(args.query, args.sort))
+        results = req.search(req.prepare_search_query(args.query, args.sort, \
+            args.year, args.type))
         req.print_search_content(results)
 
     if hasattr(args, 'identifier'):
