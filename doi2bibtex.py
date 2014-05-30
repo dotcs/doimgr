@@ -66,18 +66,6 @@ rows to load')
     parser_doi = subparsers.add_parser('cite', help='Cite article based on \
 DOI in different citation formats')
     parser_doi.add_argument('identifier', type=str, help='DOI identifier')
-    parser_doi.add_argument('-f', '--format', type=str, default='bibtex', \
-            choices=[
-                'bibtex',
-                'citeproc-json',
-                'datacite-xml',
-                'rdf-turtle',
-                'rdf-xml',
-                'ris',
-                'text',
-                'unixref-xml',
-            ], help='output format when searching for a \
-specific DOI')
     parser_doi.add_argument('-s', '--style', type=str, default='bibtex',
             help='Citation style')
     parser.add_argument('-q', '--quiet', action='store_true', help='turns off \
