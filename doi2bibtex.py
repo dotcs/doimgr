@@ -31,6 +31,8 @@ to find a specific DOI or getting information about a keyword/topic.""")
             set additional information about the type is shown')
     parser_search.add_argument('--show-publisher', action='store_true',
         help='if set additional information about the publisher is shown')
+    parser_search.add_argument('--show-url', action='store_true',
+        help='if set a URL to the document is shown')
     parser_search.add_argument('--sort', type=str, default='score', \
             choices=['score', 'updated', 'deposited', 'indexed', 'published'], \
             help='sorting of search queries')
@@ -98,7 +100,7 @@ all unnecessary outputs; use this for scripting')
         results = req.search(req.prepare_search_query(args.query, args.sort, \
             args.order, args.year, args.type, args.rows))
         req.print_search_content(results, args.show_authors, args.show_type,
-                args.show_publisher)
+                args.show_publisher, args.show_url)
 
     if hasattr(args, 'identifier'):
         logging.debug('Arguments match to request single DOI')

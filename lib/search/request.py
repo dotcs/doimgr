@@ -56,7 +56,7 @@ script cannot deal with. Aborting.".format(request_status))
         return content.decode('utf-8')
 
     def print_search_content(self, content, show_authors=False,
-            show_type=False, show_publisher=False):
+            show_type=False, show_publisher=False, show_url=False):
         base_template = "{score:.2f} - {year:4d} - {doi:40} - {title}"
         template = base_template
 
@@ -66,6 +66,8 @@ script cannot deal with. Aborting.".format(request_status))
             template += "\n  TYPE      : {type}"
         if show_publisher:
             template += "\n  PUBLISHER : {publisher}"
+        if show_url:
+            template += "\n  URL       : {url}"
 
         json_content = json.loads(content)
         for result in json_content['message']['items']:
@@ -78,6 +80,7 @@ script cannot deal with. Aborting.".format(request_status))
                 "authors"   : sr.get_authors(),
                 "type"      : sr.get_type(),
                 "publisher" : sr.get_publisher(),
+                "url"       : sr.get_url()
             }
 
             print(template.format(**payload))

@@ -11,14 +11,15 @@ class SearchResult(object):
 
     """
     def __init__(self, json=None):
-        self.authors = None
-        self.doi = None
-        self.publisher= None
-        self.score = None
-        self.subtitle = None
-        self.title = None
-        self.type = None
-        self.year = None
+        self.authors   = None
+        self.doi       = None
+        self.publisher = None
+        self.score     = None
+        self.subtitle  = None
+        self.title     = None
+        self.type      = None
+        self.year      = None
+        self.url       = None
 
         if json is not None:
             self.parse_json(json)
@@ -44,6 +45,7 @@ class SearchResult(object):
             self.authors = ""
         self.type = json['type']
         self.publisher = json['publisher']
+        self.url = json['URL']
 
     def format_title(self, title):
         def repl_func(m):
@@ -76,6 +78,9 @@ class SearchResult(object):
 
     def get_publisher(self):
         return self.publisher
+
+    def get_url(self):
+        return self.url
 
     def __str__(self):
         return self.__unicode__()
