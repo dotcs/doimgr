@@ -17,6 +17,7 @@ class SearchResult(object):
         self.subtitle = None
         self.year = None
         self.authors = None
+        self.type = None
 
         if json is not None:
             self.parse_json(json)
@@ -35,6 +36,7 @@ class SearchResult(object):
             self.authors = self.__format_authors(json['author'])
         except KeyError:
             self.authors = ""
+        self.type = json['type']
 
     def format_title(self, title):
         def repl_func(m):
@@ -61,6 +63,9 @@ class SearchResult(object):
 
     def get_authors(self):
         return self.authors
+
+    def get_type(self):
+        return self.type
 
     def __str__(self):
         return self.__unicode__()

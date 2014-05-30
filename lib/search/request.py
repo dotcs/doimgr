@@ -57,19 +57,28 @@ script cannot deal with. Aborting.".format(request_status))
 
         return content.decode('utf-8')
 
-    def print_search_content(self, content, show_authors):
+    def print_search_content(self, content, show_authors, show_type):
+        base_template = "{score:.2f} - {year:4d} - {doi:40} - {title}"
+        template = base_template
+
+        if show_authors:
+            template += "\n  AUTHORS: {authors}"
+        if show_type:
+            template += "\n  TYPE: {type}"
+
         json_content = json.loads(content)
         for result in json_content['message']['items']:
             sr = SearchResult(result)
-            if show_authors:
-                print("{:.2f} - {:4d} - {:40} - {}\n\t{}\n". \
-                        format(sr.get_score(), sr.get_year(), \
-                        sr.get_doi().get_identifier(), sr.get_title(), sr.get_authors()))
-            else:
-                print("{:.2f} - {:4d} - {:40} - {}". \
-                        format(sr.get_score(), sr.get_year(), \
-                        sr.get_doi().get_identifier(), sr.get_title()))
+            payload = {
+                    "score"   : sr.get_score(),
+                    "year"    : sr.get_year(),
+                    "doi"     : sr.get_doi().get_identifier(),
+                    "title"   : sr.get_title(),
+                    "authors" : sr.get_authors(),
+                    "type"    : sr.get_type(),
+            }
 
+            print(template.format(**payload))
 
     def citation(self, query):
         url = "{}://{}?{}".format(self.URL_PROTOCOL, self.URL_SERVICE_CITATION, query)

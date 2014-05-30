@@ -18,6 +18,8 @@ a published article to find the relevant DOI')
     parser_search.add_argument('query', type=str, help='search string')
     parser_search.add_argument('--show-authors', action='store_true', help='if \
             set additional author information is shown')
+    parser_search.add_argument('--show-type', action='store_true', help='if \
+            set additional information about the type is shown')
     parser_search.add_argument('--sort', type=str, default='score', \
             choices=['score', 'updated', 'deposited', 'indexed', 'published'], \
             help='sorting of search queries')
@@ -83,7 +85,7 @@ all unnecessary outputs; use this for scripting')
         req = Request()
         results = req.search(req.prepare_search_query(args.query, args.sort, \
             args.order, args.year, args.type, args.rows))
-        req.print_search_content(results, args.show_authors)
+        req.print_search_content(results, args.show_authors, args.show_type)
 
     if hasattr(args, 'identifier'):
         logging.debug('Arguments match to request single DOI')
