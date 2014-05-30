@@ -35,32 +35,9 @@ class Request(object):
 
         return urllib.parse.urlencode(payload)
 
-    def prepare_citation_query(self, doi_identifier, cite_format):
+    def prepare_citation_query(self, doi_identifier):
         doi = DOI(doi_identifier)
-        return "{doi}/transform/{format}".format(**{
-            'doi'    : doi.get_identifier(),
-            'format' : \
-            self.__get_format_content_type_by_identifier(cite_format),
-        })
-
-    def __get_format_content_type_by_identifier(self, identifier):
-        if identifier == 'bibtex':
-            return 'application/x-bibtex'
-        if identifier == 'citeproc-json':
-            return 'application/vnd.citationstyles.csl+json'
-        if identifier == 'datacite-xml':
-            return 'application/vnd.datacite.datacite+xml'
-        if identifier == 'rdf-turtle':
-            return 'text/turtle'
-        if identifier == 'rdf-xml':
-            return 'application/rdf+xml'
-        if identifier == 'ris':
-            return 'application/x-research-info-systems'
-        if identifier == 'text':
-            return 'text/x-bibliography'
-        if identifier == 'unixref-xml':
-            return 'application/vnd.crossref.unixref+xml'
-        raise ValueError("Identifier {} not known. Aborting.".format(identifier))
+        return doi.get_identifier() + '/transform'
 
     def search(self, query):
         url = "{}://{}?{}".format(self.URL_PROTOCOL, \
@@ -78,7 +55,8 @@ script cannot deal with. Aborting.".format(request_status))
 
         return content.decode('utf-8')
 
-    def print_search_content(self, content, show_authors, show_type):
+    def print_search_content(self, content, show_authors=False,
+            show_type=False):
         base_template = "{score:.2f} - {year:4d} - {doi:40} - {title}"
         template = base_template
 
@@ -101,12 +79,15 @@ script cannot deal with. Aborting.".format(request_status))
 
             print(template.format(**payload))
 
-    def citation(self, query):
-        url = "{}://{}/{}".format(self.URL_PROTOCOL, self.URL_SERVICE_DOIS, query)
+    def citation(self, query, style='bibtex'):
+        url = "{}://{}/{}".format(self.URL_PROTOCOL, self.URL_SERVICE_DOIS,
+                query)
         logging.debug("Cite URL: {}".format(url))
+        logging.debug("Style: {}".format(style))
 
         h = httplib2.Http(".cache")
-        resp, content = h.request(url, "GET")
+        resp, content = h.request(url, "GET", 
+            headers={'Accept':'text/x-bibliography; style={}'.format(style)})
 
         request_status = int(resp['status'])
         if request_status != 200:

@@ -6,6 +6,13 @@ import logging
 
 from lib.search.request import Request
 
+def get_valid_styles():
+    stylenames_path = os.path.join(os.path.dirname(__file__), 'API',
+            'styles.txt')
+    with open(stylenames_path, 'r') as f:
+        styles = f.read().split('\n')
+    return styles
+
 def main(argv):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -71,13 +78,15 @@ DOI in different citation formats')
                 'unixref-xml',
             ], help='output format when searching for a \
 specific DOI')
-
+    parser_doi.add_argument('-s', '--style', type=str, default='bibtex',
+            help='Citation style')
     parser.add_argument('-q', '--quiet', action='store_true', help='turns off \
 all unnecessary outputs; use this for scripting')
     parser.add_argument('--log-level', type=str, choices=['info', 'debug'], \
             default='info', help='set the logging level')
 
     args = parser.parse_args()
+
 
     # set the logging levels according to the users choice
     if args.quiet:
@@ -97,8 +106,17 @@ all unnecessary outputs; use this for scripting')
 
     if hasattr(args, 'identifier'):
         logging.debug('Arguments match to request single DOI')
+
+        # check if given style is a valid style
+        # this is not done via argparse directly due to the amount of possible
+        # parameters
+        styles = get_valid_styles()
+        if args.style not in styles:
+            raise ValueError("Given style \"{}\" is not valid. \
+Aborting.".format(args.style))
+
         req = Request()
-        result = req.citation(req.prepare_citation_query(args.identifier, args.format))
+        result = req.citation(req.prepare_citation_query(args.identifier), style=args.style)
         req.print_citation(result)
 
 if __name__ == "__main__":
