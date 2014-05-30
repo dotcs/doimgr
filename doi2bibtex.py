@@ -20,8 +20,10 @@ def main(argv):
 it to BibTex entries.')
     subparsers = parser.add_subparsers()
 
-    parser_search = subparsers.add_parser('search', help='Search database for \
-a published article to find the relevant DOI')
+    parser_search = subparsers.add_parser('search', 
+        help='Search database for a published article to find the relevant DOI',
+        description="""Searches database for published articles. This can be used
+to find a specific DOI or getting information about a keyword/topic.""")
     parser_search.add_argument('query', type=str, help='search string')
     parser_search.add_argument('--show-authors', action='store_true', help='if \
             set additional author information is shown')
@@ -65,8 +67,12 @@ rows to load')
         'standard-series',
         ], help='limit the type')
 
-    parser_cite = subparsers.add_parser('cite', help='Cite article based on \
-DOI in different citation formats')
+    parser_cite = subparsers.add_parser('cite',
+        help='Cite article based on DOI in different citation formats', 
+        description="""Cite articles with a known DOI. Formatting can be done
+using the `style`-parameter and supports hundreds of different citation
+formats. A full list of supported formats can be found in the subfolder
+`API/styles.txt`. The most common ones are `apa` and `bibtex`.""")
     parser_cite.add_argument('identifier', type=str, help='DOI identifier')
     parser_cite.add_argument('-s', '--style', type=str, default='bibtex',
             help='Citation style')
@@ -76,7 +82,6 @@ all unnecessary outputs; use this for scripting')
             default='info', help='set the logging level')
 
     args = parser.parse_args()
-
 
     # set the logging levels according to the users choice
     if args.quiet:
