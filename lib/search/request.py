@@ -17,7 +17,6 @@ class Request(object):
     """
     URL_PROTOCOL = "http"
     URL_SERVICE_DOIS = "api.crossref.org/works"
-    URL_SERVICE_CITATION = "search.crossref.org/citation"
 
     def __init__(self):
         pass
@@ -38,8 +37,30 @@ class Request(object):
 
     def prepare_citation_query(self, doi_identifier, cite_format):
         doi = DOI(doi_identifier)
-        payload = {'format': cite_format, 'doi': doi.get_identifier()}
-        return urllib.parse.urlencode(payload)
+        return "{doi}/transform/{format}".format(**{
+            'doi'    : doi.get_identifier(),
+            'format' : \
+            self.__get_format_content_type_by_identifier(cite_format),
+        })
+
+    def __get_format_content_type_by_identifier(self, identifier):
+        if identifier == 'bibtex':
+            return 'application/x-bibtex'
+        if identifier == 'citeproc-json':
+            return 'application/vnd.citationstyles.csl+json'
+        if identifier == 'datacite-xml':
+            return 'application/vnd.datacite.datacite+xml'
+        if identifier == 'rdf-turtle':
+            return 'text/turtle'
+        if identifier == 'rdf-xml':
+            return 'application/rdf+xml'
+        if identifier == 'ris':
+            return 'application/x-research-info-systems'
+        if identifier == 'text':
+            return 'text/x-bibliography'
+        if identifier == 'unixref-xml':
+            return 'application/vnd.crossref.unixref+xml'
+        raise ValueError("Identifier {} not known. Aborting.".format(identifier))
 
     def search(self, query):
         url = "{}://{}?{}".format(self.URL_PROTOCOL, \
@@ -81,7 +102,7 @@ script cannot deal with. Aborting.".format(request_status))
             print(template.format(**payload))
 
     def citation(self, query):
-        url = "{}://{}?{}".format(self.URL_PROTOCOL, self.URL_SERVICE_CITATION, query)
+        url = "{}://{}/{}".format(self.URL_PROTOCOL, self.URL_SERVICE_DOIS, query)
         logging.debug("Cite URL: {}".format(url))
 
         h = httplib2.Http(".cache")

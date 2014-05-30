@@ -60,8 +60,16 @@ rows to load')
 DOI in different citation formats')
     parser_doi.add_argument('identifier', type=str, help='DOI identifier')
     parser_doi.add_argument('-f', '--format', type=str, default='bibtex', \
-            choices=['bibtex', 'ris', 'apa', 'harvard', 'ieee', 'mla', \
-            'vancouver', 'chicago'], help='output format when searching for a \
+            choices=[
+                'bibtex',
+                'citeproc-json',
+                'datacite-xml',
+                'rdf-turtle',
+                'rdf-xml',
+                'ris',
+                'text',
+                'unixref-xml',
+            ], help='output format when searching for a \
 specific DOI')
 
     parser.add_argument('-q', '--quiet', action='store_true', help='turns off \
