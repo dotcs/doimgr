@@ -26,12 +26,17 @@ class SearchResult(object):
     def parse_json(self, json):
         self.doi = DOI(json['URL'])
         self.score = float(json['score'])
-        self.title = self.format_title(json['title'][0])
-        # set year to 0 if unknown
+        try:
+            self.title = self.format_title(json['title'][0])
+        except IndexError:
+            # set title to 'Unknown' if unknown
+            self.title = "Unknown"
+
         #self.timestamp = float(json['deposited']['timestamp'])/1000.
         try:
             self.year = int(json['issued']['date-parts'][0][0])
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, IndexError):
+            # set year to 0 if unknown
             self.year = 0
         try:
             self.authors = self.__format_authors(json['author'])

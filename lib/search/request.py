@@ -64,20 +64,20 @@ script cannot deal with. Aborting.".format(request_status))
             template += "\n  AUTHORS   : {authors}"
         if show_type:
             template += "\n  TYPE      : {type}"
-        if show_type:
+        if show_publisher:
             template += "\n  PUBLISHER : {publisher}"
 
         json_content = json.loads(content)
         for result in json_content['message']['items']:
             sr = SearchResult(result)
             payload = {
-                    "score"   : sr.get_score(),
-                    "year"    : sr.get_year(),
-                    "doi"     : sr.get_doi().get_identifier(),
-                    "title"   : sr.get_title(),
-                    "authors" : sr.get_authors(),
-                    "type"    : sr.get_type(),
-                    "publisher"    : sr.get_publisher(),
+                "score"     : sr.get_score(),
+                "year"      : sr.get_year(),
+                "doi"       : sr.get_doi().get_identifier(),
+                "title"     : sr.get_title(),
+                "authors"   : sr.get_authors(),
+                "type"      : sr.get_type(),
+                "publisher" : sr.get_publisher(),
             }
 
             print(template.format(**payload))
