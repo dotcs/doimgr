@@ -65,10 +65,10 @@ rows to load')
         'standard-series',
         ], help='limit the type')
 
-    parser_doi = subparsers.add_parser('cite', help='Cite article based on \
+    parser_cite = subparsers.add_parser('cite', help='Cite article based on \
 DOI in different citation formats')
-    parser_doi.add_argument('identifier', type=str, help='DOI identifier')
-    parser_doi.add_argument('-s', '--style', type=str, default='bibtex',
+    parser_cite.add_argument('identifier', type=str, help='DOI identifier')
+    parser_cite.add_argument('-s', '--style', type=str, default='bibtex',
             help='Citation style')
     parser.add_argument('-q', '--quiet', action='store_true', help='turns off \
 all unnecessary outputs; use this for scripting')
