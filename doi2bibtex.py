@@ -17,8 +17,8 @@ def get_valid_styles():
     """
     Method to derive valid style identifiers. There are a lot of style
     identifiers allowed, which are listed in the file `API/styles.txt`. This
-    returns a list of valid identifiers by reading the file and returning its
-    content.
+    method returns a list of valid identifiers by reading the file and
+    returning its content.
 
     @return: (list) valid style identifiers
 
