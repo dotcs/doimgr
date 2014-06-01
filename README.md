@@ -155,6 +155,24 @@ more.
 Also you can change the default style for the `cite` command by changing
 `style` in the `cite` section.
 
+## Good to know
+### Simplify access to _doimgr_
+Depending on your knowledge of Linux/Mac, you might know how to place the
+script in your `$PATH` environment variable. If not, you might follow these
+steps. It's easy to do.
+
+    1. Check if you have user `~/bin` folder by typing `mkdir ~/bin`. This will
+       create a `bin`-folder inside your home-directory if you do not have one
+       yet.
+    2. Make the script executable by running `chmod +x
+       /path/to/doimgr/doimgr.py`, where you have to substitute the correct
+       path
+    3. Link the file to the `bin`-folder by first navigating to the folder: `cd
+       ~/bin`. Then create the link via `ln -s /path/to/doimgr/doimgr.py
+       doimgr`.
+    4. Try to call the script via `doimgr --help`. If this shows the help the
+       _doimgr_ command, you are done.
+
 ## Debugging and scripting
 _doimgr_ supports different logging messages, that are shown. You can increase
 the amount of messages by using `--log-level debug`.
@@ -162,7 +180,8 @@ the amount of messages by using `--log-level debug`.
     :::bash
     python doimgr.py --log-level debug search "Stephen Hawkings"
 
-Of course you can also script _doimgr_. It is a good idea, to use the `--quiet` flag then, which surpresses all messages but the results of queries.
+Of course you can also script _doimgr_. It is a good idea, to use the `--quiet`
+flag then, which suppresses all messages but the results of queries.
 
 An example call could look like
 
