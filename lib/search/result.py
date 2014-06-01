@@ -10,6 +10,10 @@ class SearchResult(object):
     Representation of an individual search result.
 
     """
+    UNKNOWN_TITLE = "Unknown title"
+    UNKNOWN_YEAR = 0
+    UNKNOWN_AUTHORS = ''
+
     def __init__(self, json=None):
         self.authors   = None
         self.doi       = None
@@ -25,27 +29,25 @@ class SearchResult(object):
             self.parse_json(json)
 
     def parse_json(self, json):
-        self.doi = DOI(json['URL'])
-        self.score = float(json['score'])
+        self.doi = DOI(json.get('URL', None))
+        self.score = float(json.get('score', 0.))
         try:
             self.title = self.format_title(json['title'][0])
-        except IndexError:
-            # set title to 'Unknown' if unknown
-            self.title = "Unknown"
+        except (IndexError, KeyError):
+            self.title = self.UNKNOWN_TITLE
 
         #self.timestamp = float(json['deposited']['timestamp'])/1000.
         try:
             self.year = int(json['issued']['date-parts'][0][0])
         except (TypeError, KeyError, IndexError):
-            # set year to 0 if unknown
-            self.year = 0
+            self.year = self.UNKNOWN_YEAR
         try:
             self.authors = self.__format_authors(json['author'])
         except KeyError:
-            self.authors = ""
-        self.type = json['type']
-        self.publisher = json['publisher']
-        self.url = json['URL']
+            self.authors = self.UNKNOWN_AUTHORS
+        self.type = json.get('type', None)
+        self.publisher = json.get('publisher', None)
+        self.url = json.get('URL', None)
 
     def format_title(self, title):
         def repl_func(m):
@@ -54,6 +56,15 @@ class SearchResult(object):
             Credits: http://stackoverflow.com/a/1549983/434227
             """
             return m.group(1) + m.group(2).upper()
+
+        if title.isupper():
+            # We are unable to reconstruct capitalized words, when everything
+            # char is capitalized.
+            # The best we can do in this case is to lower everything and let
+            # our method do the rest.
+            # Using this method will lose capitalized word though.
+            title = title.lower()
+
         title = self.__clean_html(title).strip()
         return re.sub("(^|\s)(\S)", repl_func, title)
 
