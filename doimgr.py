@@ -62,10 +62,11 @@ to find a specific DOI or getting information about a keyword/topic.""")
     parser_search.add_argument('--show-url', action='store_true',
         default=config.getboolean('search', 'show-url', fallback=False),
         help='if set a URL to the document is shown')
-    parser_search.add_argument('--sort', type=str,
-        choices=['score', 'updated', 'deposited', 'indexed', 'published'],
+    allowed_sort_types=['score', 'updated', 'deposited', 'indexed', 'published']
+    parser_search.add_argument('--sort', type=str, choices=allowed_sort_types,
         default=config.get('search', 'sort', fallback='score'),
-        help='sorting of search queries')
+        help='sorting of search queries; allowed values are {}'\
+            .format(", ".join(allowed_sort_types)), metavar='')
     parser_search.add_argument('--order', type=str,
         choices=['asc', 'desc'],
         default=config.get('search', 'order', fallback='desc'),
@@ -77,7 +78,7 @@ to find a specific DOI or getting information about a keyword/topic.""")
         default=config.getint('search', 'rows', fallback=20),
         help='number of rows to load')
     # receive allowed types via http://api.crossref.org/types
-    parser_search.add_argument('--type', type=str, choices=[
+    allowed_types = [
         'book',
         'book-chapter',
         'book-entry',
@@ -102,9 +103,12 @@ to find a specific DOI or getting information about a keyword/topic.""")
         'report',
         'standard',
         'standard-series',
-        ],
+    ]
+    parser_search.add_argument('--type', type=str, choices=allowed_types,
         default=config.get('search', 'type', fallback=None),
-        help='limit the type')
+        help='selects a single type; allowed values are {}'.format(", "\
+            .join(allowed_types)),
+        metavar='')
 
     parser_cite = subparsers.add_parser('cite',
         help='Cite article based on DOI in different citation formats', 
