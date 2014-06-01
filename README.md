@@ -200,7 +200,7 @@ An example call could look like
 python doimgr.py search "Stephen Hawkings Black Holes" --type journal-article --rows 3 | awk '{print $5}'
 ```
 
-The are then just the _DOIs_:
+The results are then just the _DOIs_:
 
     10.2307/4612083
     10.1038/nature.2014.14583
