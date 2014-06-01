@@ -123,8 +123,14 @@ formats. A full list of supported formats can be found in the subfolder
     parser.add_argument('--log-level', type=str, choices=['info', 'debug'],
         default=config.get('general', 'log-level', fallback="info"),
         help='set the logging level')
+    parser.add_argument('--version', action="store_true",
+        help='shows the version of doimgr')
 
     args = parser.parse_args()
+
+    if args.version:
+        print("doimgr version: {}".format(__version__))
+        sys.exit()
 
     # set the logging levels according to the users choice
     if args.quiet:
@@ -134,6 +140,8 @@ formats. A full list of supported formats can be found in the subfolder
         if args.log_level == 'debug':
             level = logging.DEBUG
     logging.basicConfig(level=level)
+
+    logging.debug("doimgr version {}".format(__version__))
 
     if hasattr(args, 'query'):
         logging.debug('Arguments match to perform search')
