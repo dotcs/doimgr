@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+# -----------------------------------------------------------------------------
+# (c) 2014 by Fabian Mueller <software@crashsource.de>
+# 
+# THIS SOFTWARE IS RELEASED UNDER THE MIT LICENSE.
+# FOR MORE INFORMATION SEE THE LINCENSE FILE.
+# -----------------------------------------------------------------------------
 import os
 import sys
 import argparse
@@ -7,6 +13,15 @@ import logging
 from lib.search.request import Request
 
 def get_valid_styles():
+    """
+    Method to derive valid style identifiers. There are a lot of style
+    identifiers allowed, which are listed in the file `API/styles.txt`. This
+    returns a list of valid identifiers by reading the file and returning its
+    content.
+
+    @return: (list) valid style identifiers
+
+    """
     stylenames_path = os.path.join(os.path.dirname(__file__), 'API',
             'styles.txt')
     with open(stylenames_path, 'r') as f:
