@@ -21,7 +21,19 @@ class Request(object):
     def __init__(self):
         pass
 
-    def prepare_search_query(self, string, sort, order, year, type, rows):
+    def prepare_search_query(self, string, sort='score', order='desc', \
+            year=None, type=None, rows=20):
+        valid_sort_methods = ('score', 'updated', 'deposited', 'indexed',
+                'published')
+        if sort not in valid_sort_methods:
+            raise ValueError("Sort method not supported. Valid values are: \
+{}".format(", ".join(valid_sort_methods)))
+
+        valid_order_methods = ('asc', 'desc')
+        if order not in valid_order_methods:
+            raise ValueError("Order method not supported. Valid values are: \
+{}".format(", ".join(valid_order_methods)))
+
         filters = []
         payload = {'query': string, 'sort': sort, 'order': order, 'rows': rows}
         if year is not None:
