@@ -5,8 +5,9 @@ A command line tool using crossref.org's API to search _Digital object identifie
 ## Install
 To install _doimgr_, you first need to clone the repository
 
-    :::bash
-    git clone https://github.com/dotcs/doimgr.git
+```bash
+git clone https://github.com/dotcs/doimgr.git
+```
 
 **Please note, that _doimgr_ is using Python version 3 and will not work with
 older Python versions.**
@@ -30,8 +31,9 @@ The first step consists of searching and finding a specific
 
 To search for a specific article, you can use the syntax
 
-    :::bash
-    python doimgr.py search "Stephen Hawking A Brief History Of Time"
+```bash
+python doimgr.py search "Stephen Hawking A Brief History Of Time"
+```
 
 which will give some results like in the following list
 
@@ -42,10 +44,10 @@ which will give some results like in the following list
 
 The columns show the following information:
 
-    1. Relevance/Score of the result
-    2. Year of publication
-    3. DOI
-    4. Title
+1. Relevance/Score of the result
+2. Year of publication
+3. DOI
+4. Title
 
 Checking the title, you may find, that you are interested in the first result,
 which is represented by the _DOI_ `10.2307/4612083`.
@@ -53,8 +55,9 @@ which is represented by the _DOI_ `10.2307/4612083`.
 ### Create a citation using a _DOI_
 In the second step, the _DOI_ can be used to create a citation using the command
 
-    :::bash
-    python doimgr.py cite 10.2307/4612083
+```bash
+python doimgr.py cite 10.2307/4612083
+```
 
 This will generate the following output
 
@@ -76,16 +79,17 @@ fine-tune our search.
 
 In general it is a good idea, to have a look at the help, to see what is possible:
 
-    :::bash
-    python doimgr.py search --help
-
+```bash
+python doimgr.py search --help
+```
 
 #### Filter journals, books, and many more
 We might be interested mostly in scientific articles, but not in books. Thus we
 can make use of the `type` parameter:
 
-    :::bash
-    python doimgr.py search "Stephen Hawkings" --type journal-article
+```bash
+python doimgr.py search "Stephen Hawkings" --type journal-article
+```
 
 The result then looks like this:
 
@@ -108,8 +112,9 @@ formats. Most common citation formats are `bibtex`, `apa`, `ieee` and
 
 Specify the format by the `--style` parameter
 
-    :::bash
-    python doimgr.py cite 10.2307/4612083 --style ieee
+```bash
+python doimgr.py cite 10.2307/4612083 --style ieee
+```
 
 This results in
 
@@ -123,8 +128,9 @@ Let's say you want always to show the authors in your search queries. You can
 do so by using the `--show-authors` flag for every query as in the following
 example:
 
-    :::bash
-    python doimgr.py search "Stephen Hawkings" --show-authors
+```bash
+python doimgr.py search "Stephen Hawkings" --show-authors
+```
 
 Since it is annoying to do this every time, you better use a config file to
 handle that for you.
@@ -132,18 +138,21 @@ handle that for you.
 The script tries to read a config file located at `~/.doimgrrc`. It is a good
 start to copy the sample file and use it as a base
 
-    :::bash
-    cp sample_config.cfg ~/.doimgrrc
+```bash
+cp sample_config.cfg ~/.doimgrrc
+```
 
 To show permanently the authors, search for the `search` section and change the line
 
-    :::config
-    show-authors   = False
+```config
+show-authors   = False
+```
 
 to
 
-    :::config
-    show-authors   = True
+```config
+show-authors   = True
+```
 
 You can do that with all other options, too. This allows you to permanently
 show authors, types, publisher and URL information. It also allows you to
@@ -177,16 +186,18 @@ steps. It's easy to do.
 _doimgr_ supports different logging messages, that are shown. You can increase
 the amount of messages by using `--log-level debug`.
 
-    :::bash
-    python doimgr.py --log-level debug search "Stephen Hawkings"
+```bash
+python doimgr.py --log-level debug search "Stephen Hawkings"
+```
 
 Of course you can also script _doimgr_. It is a good idea, to use the `--quiet`
 flag then, which suppresses all messages but the results of queries.
 
 An example call could look like
 
-    :::bash
-    python doimgr.py search "Stephen Hawkings Black Holes" --type journal-article --rows 3 | awk '{print $5}'
+```bash
+python doimgr.py search "Stephen Hawkings Black Holes" --type journal-article --rows 3 | awk '{print $5}'
+```
 
 The are then just the _DOIs_:
 
