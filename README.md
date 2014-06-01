@@ -14,8 +14,9 @@ older Python versions.**
 
 Make sure, that you have installed all necessary packages
 
-    :::bash
-    pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
+```
 
 Depending on your system environment, you might be interested in using a
 [virtual
