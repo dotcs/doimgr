@@ -13,6 +13,10 @@ import configparser
 
 from lib.search.request import Request
 
+# MAIN VERSION OF THIS PROGRAM
+__version_info__ = (0, 1, 0)
+__version__      = '.'.join(map(str, __version_info__))
+
 def get_valid_styles():
     """
     Method to derive valid style identifiers. There are a lot of style
