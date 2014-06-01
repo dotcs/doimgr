@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 import logging
+import configparser
 
 from lib.search.request import Request
 
@@ -29,6 +30,11 @@ def get_valid_styles():
     return styles
 
 def main(argv):
+    config = configparser.ConfigParser()
+    config_path = os.path.expanduser(os.path.join("~", ".doi2bibtexrc"))
+    if os.path.isfile(config_path):
+        config.read(config_path)
+
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Command line based tool to request DOI data and convert \
@@ -40,22 +46,32 @@ it to BibTex entries.')
         description="""Searches database for published articles. This can be used
 to find a specific DOI or getting information about a keyword/topic.""")
     parser_search.add_argument('query', type=str, help='search string')
-    parser_search.add_argument('--show-authors', action='store_true', help='if \
-            set additional author information is shown')
-    parser_search.add_argument('--show-type', action='store_true', help='if \
-            set additional information about the type is shown')
+    parser_search.add_argument('--show-authors', action='store_true',
+        default=config.getboolean('search', 'show-authors', fallback=False),
+        help='if set additional author information is shown')
+    parser_search.add_argument('--show-type', action='store_true',
+        default=config.getboolean('search', 'show-type', fallback=False),
+        help='if set additional information about the type is shown')
     parser_search.add_argument('--show-publisher', action='store_true',
+        default=config.getboolean('search', 'show-publisher', fallback=False),
         help='if set additional information about the publisher is shown')
     parser_search.add_argument('--show-url', action='store_true',
+        default=config.getboolean('search', 'show-url', fallback=False),
         help='if set a URL to the document is shown')
-    parser_search.add_argument('--sort', type=str, default='score', \
-            choices=['score', 'updated', 'deposited', 'indexed', 'published'], \
-            help='sorting of search queries')
-    parser_search.add_argument('--order', type=str, default='desc', \
-            choices=['asc', 'desc'], help='ordering of search queries')
-    parser_search.add_argument('--year', type=int, help='limit the year')
-    parser_search.add_argument('--rows', type=int, default=20, help='number of \
-rows to load')
+    parser_search.add_argument('--sort', type=str,
+        choices=['score', 'updated', 'deposited', 'indexed', 'published'],
+        default=config.get('search', 'sort', fallback='score'),
+        help='sorting of search queries')
+    parser_search.add_argument('--order', type=str,
+        choices=['asc', 'desc'],
+        default=config.get('search', 'order', fallback='desc'),
+        help='ordering of search queries')
+    parser_search.add_argument('--year', type=int,
+        default=config.getint('search', 'year', fallback=None),
+        help='limit the year')
+    parser_search.add_argument('--rows', type=int,
+        default=config.getint('search', 'rows', fallback=20),
+        help='number of rows to load')
     # receive allowed types via http://api.crossref.org/types
     parser_search.add_argument('--type', type=str, choices=[
         'book',
@@ -82,7 +98,9 @@ rows to load')
         'report',
         'standard',
         'standard-series',
-        ], help='limit the type')
+        ],
+        default=config.get('search', 'type', fallback=None),
+        help='limit the type')
 
     parser_cite = subparsers.add_parser('cite',
         help='Cite article based on DOI in different citation formats', 
@@ -91,12 +109,16 @@ using the `style`-parameter and supports hundreds of different citation
 formats. A full list of supported formats can be found in the subfolder
 `API/styles.txt`. The most common ones are `apa` and `bibtex`.""")
     parser_cite.add_argument('identifier', type=str, help='DOI identifier')
-    parser_cite.add_argument('-s', '--style', type=str, default='bibtex',
-            help='Citation style')
-    parser.add_argument('-q', '--quiet', action='store_true', help='turns off \
-all unnecessary outputs; use this for scripting')
-    parser.add_argument('--log-level', type=str, choices=['info', 'debug'], \
-            default='info', help='set the logging level')
+    parser_cite.add_argument('-s', '--style', type=str,
+        default=config.get('cite', 'style', fallback="bibtex"),
+        help='Citation style')
+
+    parser.add_argument('-q', '--quiet', action='store_true', 
+        default=config.getboolean('general', 'quiet', fallback=False),
+        help='turns off all unnecessary outputs; use this for scripting')
+    parser.add_argument('--log-level', type=str, choices=['info', 'debug'],
+        default=config.get('general', 'log-level', fallback="info"),
+        help='set the logging level')
 
     args = parser.parse_args()
 
