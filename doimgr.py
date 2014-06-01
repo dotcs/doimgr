@@ -35,7 +35,7 @@ def get_valid_styles():
 
 def main(argv):
     config = configparser.ConfigParser()
-    config_path = os.path.expanduser(os.path.join("~", ".doi2bibtexrc"))
+    config_path = os.path.expanduser(os.path.join("~", ".doimgrrc"))
     if os.path.isfile(config_path):
         config.read(config_path)
 
