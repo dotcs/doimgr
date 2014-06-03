@@ -8,6 +8,7 @@ import re
 
 from lib.search.result import SearchResult
 from lib.doi import DOI
+from lib.fulltexturl import FullTextURL
 
 class Request(object):
     """
@@ -116,6 +117,37 @@ script cannot deal with. Aborting.".format(request_status))
 
     def print_citation(self, content):
         print(self.__clean_html(content))
+
+    def get_download_links(self, identifier):
+        url = "{}://{}/{}".format(self.URL_PROTOCOL, self.URL_SERVICE_DOIS,
+                identifier)
+        response = self._request(url)
+        links = []
+        for link in response.get('link', ()):
+            content_version = link['content-version']
+            license = self._find_license(response, content_version)
+            links.append(FullTextURL(link.get("URL", ""), license.get("URL",
+                None)))
+        return links
+
+    def _find_license(self, response, content_version):
+        for license in response.get('license', ()):
+            if license.get("content-version", "") == content_version:
+                return license
+        return None
+
+    def _request(self, url, 
+            headers={'content-type': 'application/json'}, method="GET"):
+
+        h = httplib2.Http(".cache")
+        resp, content = h.request(url, method, headers=headers)
+
+        request_status = int(resp['status'])
+        if request_status != 200:
+            raise RuntimeError("The server responded with code {:d}, which the \
+script cannot deal with. Aborting.".format(request_status))
+
+        return json.loads(content.decode('utf-8'))['message']
 
     def __clean_html(self, raw_html):
         regex = re.compile(r'<(.*?)>(.*?)</\1>')

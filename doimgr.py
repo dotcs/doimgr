@@ -109,6 +109,7 @@ to find a specific DOI or getting information about a keyword/topic.""")
         help='selects a single type; allowed values are {}'.format(", "\
             .join(allowed_types)),
         metavar='')
+    parser_search.set_defaults(which_parser='search')
 
     parser_cite = subparsers.add_parser('cite',
         help='Cite article based on DOI in different citation formats', 
@@ -120,6 +121,14 @@ formats. A full list of supported formats can be found in the subfolder
     parser_cite.add_argument('-s', '--style', type=str,
         default=config.get('cite', 'style', fallback="bibtex"),
         help='Citation style')
+    parser_cite.set_defaults(which_parser='cite')
+
+    parser_download = subparsers.add_parser('download',
+        help='Download articles based on their DOI', 
+        description="""Downloads articles, if a full text verison is provided
+by the authors.""")
+    parser_download.add_argument('identifier', type=str, help='DOI identifier')
+    parser_download.set_defaults(which_parser='download')
 
     parser.add_argument('-q', '--quiet', action='store_true', 
         default=config.getboolean('general', 'quiet', fallback=False),
@@ -147,28 +156,37 @@ formats. A full list of supported formats can be found in the subfolder
 
     logging.debug("doimgr version {}".format(__version__))
 
-    if hasattr(args, 'query'):
-        logging.debug('Arguments match to perform search')
-        req = Request()
-        results = req.search(req.prepare_search_query(args.query, args.sort, \
-            args.order, args.year, args.type, args.rows))
-        req.print_search_content(results, args.show_authors, args.show_type,
-                args.show_publisher, args.show_url)
+    if hasattr(args, 'which_parser'):
+        if args.which_parser == 'search':
+            logging.debug('Arguments match to perform search')
+            req = Request()
+            results = req.search(req.prepare_search_query(args.query, args.sort, \
+                args.order, args.year, args.type, args.rows))
+            req.print_search_content(results, args.show_authors, args.show_type,
+                    args.show_publisher, args.show_url)
 
-    if hasattr(args, 'identifier'):
-        logging.debug('Arguments match to request single DOI')
+        elif args.which_parser == 'cite':
+            logging.debug('Arguments match to request single DOI')
 
-        # check if given style is a valid style
-        # this is not done via argparse directly due to the amount of possible
-        # parameters
-        styles = get_valid_styles()
-        if args.style not in styles:
-            raise ValueError("Given style \"{}\" is not valid. \
-Aborting.".format(args.style))
+            # check if given style is a valid style
+            # this is not done via argparse directly due to the amount of possible
+            # parameters
+            styles = get_valid_styles()
+            if args.style not in styles:
+                raise ValueError("Given style \"{}\" is not valid. \
+    Aborting.".format(args.style))
 
-        req = Request()
-        result = req.citation(req.prepare_citation_query(args.identifier), style=args.style)
-        req.print_citation(result)
+            req = Request()
+            result = req.citation(req.prepare_citation_query(args.identifier), style=args.style)
+            req.print_citation(result)
+
+        elif args.which_parser == 'download':
+            logging.debug('Arguments match to download single DOI')
+
+            req = Request()
+            for link in req.get_download_links(args.identifier):
+                print(link)
+
 
 if __name__ == "__main__":
     main(sys.argv)
