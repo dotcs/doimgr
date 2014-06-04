@@ -15,7 +15,7 @@ from lib.search.request import Request
 from lib.downloader import Downloader
 
 # MAIN VERSION OF THIS PROGRAM
-__version_info__ = (0, 1, 0)
+__version_info__ = (0, 1, 1)
 __version__      = '.'.join(map(str, __version_info__))
 
 def get_valid_styles():
