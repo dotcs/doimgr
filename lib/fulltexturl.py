@@ -9,3 +9,9 @@ class FullTextURL(object):
 
     def __str__(self):
         return "<FullText @ {}>".format(self.url)
+
+    def get_url(self):
+        return self.url
+
+    def get_license_url(self):
+        return self.license_url

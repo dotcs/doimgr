@@ -46,7 +46,7 @@ it to BibTex entries.')
     subparsers = parser.add_subparsers()
 
     parser_search = subparsers.add_parser('search', 
-        help='Search database for a published article to find the relevant DOI',
+        help='Search database for published articles to find relevant DOIs',
         description="""Searches database for published articles. This can be used
 to find a specific DOI or getting information about a keyword/topic.""")
     parser_search.add_argument('query', type=str, help='search string')
@@ -128,6 +128,9 @@ formats. A full list of supported formats can be found in the subfolder
         description="""Downloads articles, if a full text verison is provided
 by the authors.""")
     parser_download.add_argument('identifier', type=str, help='DOI identifier')
+    parser_download.add_argument('-d', '--destination', type=str,
+        default=config.get('download', 'destination', fallback="."),
+        help='download destination')
     parser_download.set_defaults(which_parser='download')
 
     parser.add_argument('-q', '--quiet', action='store_true', 
@@ -183,9 +186,22 @@ by the authors.""")
         elif args.which_parser == 'download':
             logging.debug('Arguments match to download single DOI')
 
+            try:
+                os.makedirs(os.path.expanduser(args.destination))
+                logging.debug("Destination dir {} created.".format(
+                    args.destination))
+            except FileExistsError:
+                logging.debug("Destination dir {} does already exists".format(
+                    args.destination))
+
             req = Request()
-            for link in req.get_download_links(args.identifier):
+            links = req.get_download_links(args.identifier)
+            for link in links:
+                url = link.get_url()
                 print(link)
+
+            if len(links) == 0:
+                logging.info("No valid download URLs found. Aborting.")
 
 
 if __name__ == "__main__":
