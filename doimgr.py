@@ -203,7 +203,8 @@ by the authors.""")
                 filepath = d.download(url, 
                     os.path.expanduser(args.destination),
                     "{}.pdf".format(args.identifier.replace("/", "_")))
-                logging.info("Saved file as {}".format(filepath))
+                if filepath is not None:
+                    logging.info("Saved file as {}".format(filepath))
 
             if len(links) == 0:
                 logging.info("No valid download URLs found. Aborting.")

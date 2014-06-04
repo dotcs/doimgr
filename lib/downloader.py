@@ -13,7 +13,11 @@ class Downloader(object):
 
     def download(self, url, path, fallback_filename):
         logging.debug("Downloading URL {}".format(url))
-        remotefile = urllib2.urlopen(url)
+        try:
+            remotefile = urllib2.urlopen(url)
+        except URLError:
+            logging.error("URL could not be opened. Aborting.")
+            return None
         filename = remotefile.info()['Content-Disposition']
         if filename is None:
             filename = fallback_filename
