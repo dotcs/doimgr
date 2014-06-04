@@ -12,6 +12,7 @@ import logging
 import configparser
 
 from lib.search.request import Request
+from lib.downloader import Downloader
 
 # MAIN VERSION OF THIS PROGRAM
 __version_info__ = (0, 1, 0)
@@ -198,7 +199,11 @@ by the authors.""")
             links = req.get_download_links(args.identifier)
             for link in links:
                 url = link.get_url()
-                print(link)
+                d = Downloader()
+                filepath = d.download(url, 
+                    os.path.expanduser(args.destination),
+                    "{}.pdf".format(args.identifier.replace("/", "_")))
+                logging.info("Saved file as {}".format(filepath))
 
             if len(links) == 0:
                 logging.info("No valid download URLs found. Aborting.")
