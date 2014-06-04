@@ -91,11 +91,13 @@ class Request(object):
     def citation(self, query, style='bibtex'):
         url = "{}://{}/{}".format(self.URL_PROTOCOL, self.URL_SERVICE_DOIS,
                 query)
+        headers={'Accept':'text/x-bibliography; style={}'.format(style)}
+
         logging.debug("Cite URL: {}".format(url))
+        logging.debug("Query headers: {}".format(headers))
         logging.debug("Style: {}".format(style))
 
-        response = self._request(url, headers={'Accept':'text/x-bibliography; \
-style={}'.format(style)}, json_message=False)
+        response = self._request(url, headers, json_message=False)
 
         return response.strip()
 
@@ -105,13 +107,17 @@ style={}'.format(style)}, json_message=False)
     def get_download_links(self, identifier):
         url = "{}://{}/{}".format(self.URL_PROTOCOL, self.URL_SERVICE_DOIS,
                 identifier)
+        logging.debug("Query URL: {}".format(url))
+
         response = self._request(url)
+
         links = []
         for link in response.get('link', ()):
             content_version = link['content-version']
             license = self._find_license(response, content_version)
             links.append(FullTextURL(link.get("URL", ""), license.get("URL",
                 None)))
+
         return links
 
     def _find_license(self, response, content_version):
