@@ -56,17 +56,8 @@ class Request(object):
         url = "{}://{}?{}".format(self.URL_PROTOCOL, \
                 self.URL_SERVICE_DOIS, query)
         logging.debug("Search URL: {}".format(url))
-
-        h = httplib2.Http(".cache")
-        resp, content = h.request(url, "GET", headers = \
-                { 'content-type': 'application/json' })
-
-        request_status = int(resp['status'])
-        if request_status != 200:
-            raise RuntimeError("The server responded with code {:d}, which the \
-script cannot deal with. Aborting.".format(request_status))
-
-        return content.decode('utf-8')
+        response = self._request(url)
+        return response
 
     def print_search_content(self, content, show_authors=False,
             show_type=False, show_publisher=False, show_url=False):
@@ -82,8 +73,7 @@ script cannot deal with. Aborting.".format(request_status))
         if show_url:
             template += "\n  URL       : {url}"
 
-        json_content = json.loads(content)
-        for result in json_content['message']['items']:
+        for result in content.get('items', ()):
             sr = SearchResult(result)
             payload = {
                 "score"     : sr.get_score(),
@@ -104,16 +94,10 @@ script cannot deal with. Aborting.".format(request_status))
         logging.debug("Cite URL: {}".format(url))
         logging.debug("Style: {}".format(style))
 
-        h = httplib2.Http(".cache")
-        resp, content = h.request(url, "GET", 
-            headers={'Accept':'text/x-bibliography; style={}'.format(style)})
+        response = self._request(url, headers={'Accept':'text/x-bibliography; \
+style={}'.format(style)}, json_message=False)
 
-        request_status = int(resp['status'])
-        if request_status != 200:
-            raise RuntimeError("The server responded with code {:d}, which the \
-script cannot deal with. Aborting.".format(request_status))
-
-        return content.decode('utf-8')
+        return response.strip()
 
     def print_citation(self, content):
         print(self.__clean_html(content))
@@ -137,7 +121,8 @@ script cannot deal with. Aborting.".format(request_status))
         return None
 
     def _request(self, url, 
-            headers={'content-type': 'application/json'}, method="GET"):
+            headers={'content-type': 'application/json'}, method="GET",
+            json_message=True):
 
         h = httplib2.Http(".cache")
         resp, content = h.request(url, method, headers=headers)
@@ -147,7 +132,9 @@ script cannot deal with. Aborting.".format(request_status))
             raise RuntimeError("The server responded with code {:d}, which the \
 script cannot deal with. Aborting.".format(request_status))
 
-        return json.loads(content.decode('utf-8'))['message']
+        if json_message:
+            return json.loads(content.decode('utf-8'))['message']
+        return content.decode('utf-8')
 
     def __clean_html(self, raw_html):
         regex = re.compile(r'<(.*?)>(.*?)</\1>')
