@@ -18,21 +18,17 @@ from lib.downloader import Downloader
 __version_info__ = (0, 1, 1)
 __version__      = '.'.join(map(str, __version_info__))
 
-def get_valid_styles():
+def get_valid_API_values(filename):
     """
-    Method to derive valid style identifiers. There are a lot of style
-    identifiers allowed, which are listed in the file `API/styles.txt`. This
-    method returns a list of valid identifiers by reading the file and
-    returning its content.
+    Method to derive valid API identifiers.
 
-    @return: (list) valid style identifiers
+    @return: (list) valid API identifiers
 
     """
-    stylenames_path = os.path.join(os.path.dirname(__file__), 'API',
-            'styles.txt')
-    with open(stylenames_path, 'r') as f:
-        styles = f.read().split('\n')
-    return styles
+    path = os.path.join(os.path.dirname(__file__), 'API', filename)
+    with open(path, 'r') as f:
+        result = f.read().split('\n')
+    return result
 
 def main(argv):
     config = configparser.ConfigParser()
@@ -79,32 +75,7 @@ to find a specific DOI or getting information about a keyword/topic.""")
         default=config.getint('search', 'rows', fallback=20),
         help='number of rows to load')
     # receive allowed types via http://api.crossref.org/types
-    allowed_types = [
-        'book',
-        'book-chapter',
-        'book-entry',
-        'book-part',
-        'book-section',
-        'book-series',
-        'book-set',
-        'book-track',
-        'component',
-        'dataset',
-        'dissertation',
-        'edited-book',
-        'journal',
-        'journal-article',
-        'journal-issue',
-        'journal-volume',
-        'monograph',
-        'other',
-        'proceedings',
-        'proceedings-article',
-        'reference-book',
-        'report',
-        'standard',
-        'standard-series',
-    ]
+    allowed_types = get_valid_API_values('types.txt')
     parser_search.add_argument('--type', type=str, choices=allowed_types,
         default=config.get('search', 'type', fallback=None),
         help='selects a single type; allowed values are {}'.format(", "\
@@ -175,7 +146,7 @@ by the authors.""")
             # check if given style is a valid style
             # this is not done via argparse directly due to the amount of possible
             # parameters
-            styles = get_valid_styles()
+            styles = get_valid_API_values('styles.txt')
             if args.style not in styles:
                 raise ValueError("Given style \"{}\" is not valid. \
     Aborting.".format(args.style))
