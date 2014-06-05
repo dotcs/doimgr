@@ -96,6 +96,14 @@ by the authors.""")
         help='download destination')
     parser_download.set_defaults(which_parser='download')
 
+    parser_service = subparsers.add_parser('service',
+        help='Provices service functions for the API such as rebuilding the \
+database of valid types and styles', 
+        description="""Provices service functions for the API such as
+rebuilding the database of valid types and styles""")
+    parser_service.add_argument('--rebuild-api-types', action='store_true', help='Rebuilds the types, that are accepted on API requests')
+    parser_service.set_defaults(which_parser='service')
+
     parser.add_argument('-q', '--quiet', action='store_true', 
         default=config.getboolean('general', 'quiet', fallback=False),
         help='turns off all unnecessary outputs; use this for scripting')
@@ -170,6 +178,12 @@ by the authors.""")
 
             if len(links) == 0:
                 logging.info("No valid download URLs found. Aborting.")
+
+        elif args.which_parser == 'service':
+            logging.debug('Arguments match with service call')
+
+            if args.rebuild_api_types:
+                api.rebuild_valid_types()
 
 
 if __name__ == "__main__":

@@ -16,7 +16,8 @@ class Request(object):
     the official API.
 
     """
-    URL_PROTOCOL = "http"
+    URL_PROTOCOL     = "http"
+    URL_API_BASE     = "api.crossref.org"
     URL_SERVICE_DOIS = "api.crossref.org/works"
 
     def __init__(self):
