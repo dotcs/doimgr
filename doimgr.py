@@ -101,7 +101,8 @@ by the authors.""")
 database of valid types and styles', 
         description="""Provices service functions for the API such as
 rebuilding the database of valid types and styles""")
-    parser_service.add_argument('--rebuild-api-types', action='store_true', help='Rebuilds the types, that are accepted on API requests')
+    parser_service.add_argument('--rebuild-api-types', action='store_true', help='Rebuild the types, that are accepted on API requests')
+    parser_service.add_argument('--rebuild-api-styles', action='store_true', help='Rebuild the styles, that are accepted on API requests')
     parser_service.set_defaults(which_parser='service')
 
     parser.add_argument('-q', '--quiet', action='store_true', 
@@ -183,8 +184,10 @@ rebuilding the database of valid types and styles""")
             logging.debug('Arguments match with service call')
 
             if args.rebuild_api_types:
-                api.rebuild_valid_types()
+                api.rebuild_valid_identifier(api.TYPE_TYPES)
 
+            if args.rebuild_api_styles:
+                api.rebuild_valid_identifier(api.TYPE_STYLES)
 
 if __name__ == "__main__":
     main(sys.argv)
