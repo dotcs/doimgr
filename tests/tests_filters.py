@@ -58,8 +58,9 @@ class TestDOI(unittest.TestCase):
         f = Filters()
         f.add('doi', self.valid_doi)
         f.add('from-pub-date', '2013')
-        self.assertEqual(f.get_formatted_filters(),
-                "doi:10.1063/1.3458497,from-pub-date:2013")
+        for entry in f.get_formatted_filters().split(','):
+            self.assertIn(entry, ["doi:10.1063/1.3458497",
+                "from-pub-date:2013"])
 
 if __name__ == "__main__":
     unittest.main()
