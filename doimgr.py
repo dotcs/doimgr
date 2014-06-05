@@ -13,22 +13,13 @@ import configparser
 
 from lib.search.request import Request
 from lib.downloader import Downloader
+from lib.api import API
 
 # MAIN VERSION OF THIS PROGRAM
 __version_info__ = (0, 1, 1)
 __version__      = '.'.join(map(str, __version_info__))
 
-def get_valid_API_values(filename):
-    """
-    Method to derive valid API identifiers.
-
-    @return: (list) valid API identifiers
-
-    """
-    path = os.path.join(os.path.dirname(__file__), 'API', filename)
-    with open(path, 'r') as f:
-        result = f.read().split('\n')
-    return result
+api = API()
 
 def main(argv):
     config = configparser.ConfigParser()
@@ -75,7 +66,7 @@ to find a specific DOI or getting information about a keyword/topic.""")
         default=config.getint('search', 'rows', fallback=20),
         help='number of rows to load')
     # receive allowed types via http://api.crossref.org/types
-    allowed_types = get_valid_API_values('types.txt')
+    allowed_types = api.get_valid_types()
     parser_search.add_argument('--type', type=str, choices=allowed_types,
         default=config.get('search', 'type', fallback=None),
         help='selects a single type; allowed values are {}'.format(", "\
@@ -146,7 +137,7 @@ by the authors.""")
             # check if given style is a valid style
             # this is not done via argparse directly due to the amount of possible
             # parameters
-            styles = get_valid_API_values('styles.txt')
+            styles = api.get_valid_styles()
             if args.style not in styles:
                 raise ValueError("Given style \"{}\" is not valid. \
     Aborting.".format(args.style))
