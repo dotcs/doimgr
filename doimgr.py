@@ -14,6 +14,7 @@ import configparser
 from lib.search.request import Request
 from lib.downloader import Downloader
 from lib.api import API
+from lib.clipboard import Clipboard
 
 # MAIN VERSION OF THIS PROGRAM
 __version_info__ = (0, 1, 1)
@@ -84,6 +85,9 @@ formats. A full list of supported formats can be found in the subfolder
     parser_cite.add_argument('-s', '--style', type=str,
         default=config.get('cite', 'style', fallback="bibtex"),
         help='Citation style')
+    parser_cite.add_argument('-c', '--copy', action='store_true',
+        default=config.get('cite', 'copy', fallback=False),
+        help="""Copies the result to the system clipboard""")
     parser_cite.set_defaults(which_parser='cite')
 
     parser_download = subparsers.add_parser('download',
@@ -154,6 +158,8 @@ rebuilding the database of valid types and styles""")
             req = Request()
             result = req.citation(req.prepare_citation_query(args.identifier), style=args.style)
             req.print_citation(result)
+            if args.copy:
+                Clipboard.copy_to(result)
 
         elif args.which_parser == 'download':
             logging.debug('Arguments match to download single DOI')
