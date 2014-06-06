@@ -15,6 +15,7 @@ from lib.search.request import Request
 from lib.downloader import Downloader
 from lib.api import API
 from lib.clipboard import Clipboard
+from lib.bulkconverter import BulkConverter
 
 # MAIN VERSION OF THIS PROGRAM
 __version_info__ = (0, 1, 1)
@@ -116,6 +117,18 @@ by the authors.""")
         help='download destination')
     parser_download.set_defaults(which_parser='download')
 
+    parser_bulk = subparsers.add_parser('bulk',
+        help='Mass converting for multiple DOIs listed in a single file.',
+        description="""Mass converting for multiple DOIs listed in a single file.""")
+    parser_bulk.add_argument('input', type=argparse.FileType('r'), 
+        help='input file path', nargs='?', default=sys.stdin)
+    parser_bulk.add_argument('output', type=argparse.FileType('w'),
+        help='output file path', nargs='?', default=sys.stdout)
+    parser_bulk.add_argument('-s', '--style', type=str,
+        default=config.get('bulk', 'style', fallback="bibtex"),
+        help='Citation style')
+    parser_bulk.set_defaults(which_parser='bulk')
+
     parser_service = subparsers.add_parser('service',
         help='Provices service functions for the API such as rebuilding the \
 database of valid types and styles', 
@@ -167,7 +180,7 @@ rebuilding the database of valid types and styles""")
         elif args.which_parser == 'cite':
             logging.debug('Arguments match to request single DOI')
 
-            # check if given style is a valid style
+            # check if given style is valid
             # this is not done via argparse directly due to the amount of
             # possible parameters
             styles = api.get_valid_styles()
@@ -206,6 +219,24 @@ rebuilding the database of valid types and styles""")
 
             if len(links) == 0:
                 logging.info("No valid download URLs found. Aborting.")
+
+        elif args.which_parser == 'bulk':
+            logging.debug('Arguments match with bulk conversion')
+
+            # check if given style valid
+            # this is not done via argparse directly due to the amount of
+            # possible parameters
+            styles = api.get_valid_styles()
+            if args.style not in styles:
+                raise ValueError("Given style \"{}\" is not valid. \
+    Aborting.".format(args.style))
+
+            b = BulkConverter()
+            if args.output == sys.stdout:
+                # switch to quiet mode, since we do not want to place
+                # unneccesary messages on stdout
+                logging.getLogger().setLevel(logging.CRITICAL)
+            b.run(args.input, args.output, style=args.style)
 
         elif args.which_parser == 'service':
             logging.debug('Arguments match with service call')
