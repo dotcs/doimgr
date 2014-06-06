@@ -6,9 +6,12 @@ import httplib2
 import logging
 import re
 
+from colorama import Fore, Back, Style
+
 from lib.search.result import SearchResult
 from lib.doi import DOI
 from lib.fulltexturl import FullTextURL
+from lib.helper import Helper
 
 class Request(object):
     """
@@ -21,7 +24,17 @@ class Request(object):
     URL_SERVICE_DOIS = "api.crossref.org/works"
 
     def __init__(self):
-        pass
+        self.colored_output = False
+
+    def set_colored_output(self, value, doi=None, title=None, more=None):
+        if type(value) != type(True):
+            raise ValueError("set_colored_output() must be called with boolean \
+value")
+        self.colored_output = value
+        self.color_doi = doi
+        self.color_title = title
+        self.color_more = more
+        return True
 
     def prepare_search_query(self, string, sort='score', order='desc', \
             year=None, type=None, rows=20):
@@ -62,17 +75,18 @@ class Request(object):
 
     def print_search_content(self, content, show_authors=False,
             show_type=False, show_publisher=False, show_url=False):
-        base_template = "{score:.2f} - {year:4d} - {doi:40} - {title}"
+        base_template = "{score:.2f} - {year:4d} - {cfg_doi}{doi:40}{cfg_end} \
+- {cfg_title}{title}{cfg_end}"
         template = base_template
 
         if show_authors:
-            template += "\n  AUTHORS   : {authors}"
+            template += "\n  {cfg_more}AUTHORS{cfg_end}   : {authors}"
         if show_type:
-            template += "\n  TYPE      : {type}"
+            template += "\n  {cfg_more}TYPE{cfg_end}      : {type}"
         if show_publisher:
-            template += "\n  PUBLISHER : {publisher}"
+            template += "\n  {cfg_more}PUBLISHER{cfg_end} : {publisher}"
         if show_url:
-            template += "\n  URL       : {url}"
+            template += "\n  {cfg_more}URL{cfg_end}       : {url}"
 
         for result in content.get('items', ()):
             sr = SearchResult(result)
@@ -84,8 +98,22 @@ class Request(object):
                 "authors"   : sr.get_authors(),
                 "type"      : sr.get_type(),
                 "publisher" : sr.get_publisher(),
-                "url"       : sr.get_url()
+                "url"       : sr.get_url(),
+                "cfg_more"  : '',
+                "cfg_end"   : '',
+                "cfg_doi"   : '',
+                "cfg_title" : '',
             }
+
+            if self.colored_output:
+                color_options = [
+                    ("cfg_doi", self.color_doi),
+                    ("cfg_title", self.color_title),
+                    ("cfg_more", self.color_more),
+                    ("cfg_end", 'reset'),
+                ]
+                for key, value in color_options:
+                    payload[key] = Helper.get_fg_colorcode_by_identifier(value)
 
             print(template.format(**payload))
 

@@ -66,6 +66,22 @@ used to find a specific DOI or getting information about a keyword/topic.""")
     parser_search.add_argument('--rows', type=int,
         default=config.getint('search', 'rows', fallback=20),
         help='number of rows to load')
+    parser_search.add_argument('--color', action="store_true",
+        default=config.getboolean('search', 'color', fallback=False),
+        help='if set, colored output is used')
+    valid_colors = ['black', 'cyan', 'magenta', 'yellow', 'blue', 'green',
+            'red', 'white']
+    parser_search.add_argument('--color-doi', type=str,
+        default=config.get('search', 'color-doi', fallback='red'),
+        choices=valid_colors, help='color for DOIs')
+    parser_search.add_argument('--color-title', type=str,
+        default=config.get('search', 'color-title', fallback='green'),
+        choices=valid_colors, help='color for titles')
+    parser_search.add_argument('--color-more', type=str,
+        default=config.get('search', 'color-more', fallback='blue'),
+        choices=valid_colors, help='color for additional information such as \
+authors, URLs, etc.')
+
     # receive allowed types via http://api.crossref.org/types
     allowed_types = api.get_valid_types()
     parser_search.add_argument('--type', type=str, choices=allowed_types,
@@ -141,6 +157,8 @@ rebuilding the database of valid types and styles""")
         if args.which_parser == 'search':
             logging.debug('Arguments match to perform search')
             req = Request()
+            req.set_colored_output(args.color, doi=args.color_doi,
+                    title=args.color_title, more=args.color_more)
             results = req.search(req.prepare_search_query(args.query,
                 args.sort, args.order, args.year, args.type, args.rows))
             req.print_search_content(results, args.show_authors,
