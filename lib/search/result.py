@@ -108,4 +108,7 @@ class SearchResult(object):
         for i, author in enumerate(author_list):
             if i >= limit: break
             author_temp.append(", ".join(author[i] for i in ('family', 'given')))
-        return "; ".join(author_temp)
+        output = "; ".join(author_temp)
+        if len(author_list) > limit:
+            output += " et al."
+        return output
