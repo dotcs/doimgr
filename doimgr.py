@@ -36,8 +36,8 @@ it to BibTex entries.')
 
     parser_search = subparsers.add_parser('search', 
         help='Search database for published articles to find relevant DOIs',
-        description="""Searches database for published articles. This can be used
-to find a specific DOI or getting information about a keyword/topic.""")
+        description="""Searches database for published articles. This can be
+used to find a specific DOI or getting information about a keyword/topic.""")
     parser_search.add_argument('query', type=str, help='search string')
     parser_search.add_argument('--show-authors', action='store_true',
         default=config.getboolean('search', 'show-authors', fallback=False),
@@ -105,8 +105,10 @@ by the authors.""")
 database of valid types and styles', 
         description="""Provices service functions for the API such as
 rebuilding the database of valid types and styles""")
-    parser_service.add_argument('--rebuild-api-types', action='store_true', help='Rebuild the types, that are accepted on API requests')
-    parser_service.add_argument('--rebuild-api-styles', action='store_true', help='Rebuild the styles, that are accepted on API requests')
+    parser_service.add_argument('--rebuild-api-types', action='store_true',
+            help='Rebuild the types, that are accepted on API requests')
+    parser_service.add_argument('--rebuild-api-styles', action='store_true',
+            help='Rebuild the styles, that are accepted on API requests')
     parser_service.set_defaults(which_parser='service')
 
     parser.add_argument('-q', '--quiet', action='store_true', 
@@ -139,24 +141,25 @@ rebuilding the database of valid types and styles""")
         if args.which_parser == 'search':
             logging.debug('Arguments match to perform search')
             req = Request()
-            results = req.search(req.prepare_search_query(args.query, args.sort, \
-                args.order, args.year, args.type, args.rows))
-            req.print_search_content(results, args.show_authors, args.show_type,
-                    args.show_publisher, args.show_url)
+            results = req.search(req.prepare_search_query(args.query,
+                args.sort, args.order, args.year, args.type, args.rows))
+            req.print_search_content(results, args.show_authors,
+                    args.show_type, args.show_publisher, args.show_url)
 
         elif args.which_parser == 'cite':
             logging.debug('Arguments match to request single DOI')
 
             # check if given style is a valid style
-            # this is not done via argparse directly due to the amount of possible
-            # parameters
+            # this is not done via argparse directly due to the amount of
+            # possible parameters
             styles = api.get_valid_styles()
             if args.style not in styles:
                 raise ValueError("Given style \"{}\" is not valid. \
     Aborting.".format(args.style))
 
             req = Request()
-            result = req.citation(req.prepare_citation_query(args.identifier), style=args.style)
+            result = req.citation(req.prepare_citation_query(args.identifier),
+                    style=args.style)
             req.print_citation(result)
             if args.copy:
                 Clipboard.copy_to(result)
