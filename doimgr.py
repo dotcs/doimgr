@@ -170,8 +170,13 @@ rebuilding the database of valid types and styles""")
         if args.which_parser == 'search':
             logging.debug('Arguments match to perform search')
             req = Request()
-            req.set_colored_output(args.color, doi=args.color_doi,
-                    title=args.color_title, more=args.color_more)
+            if sys.stdout.isatty():
+                # only allow colors when the script's output is not redirected
+                req.set_colored_output(args.color, doi=args.color_doi,
+                        title=args.color_title, more=args.color_more)
+            else:
+                logging.debug('Colors have been disabled due to detected \
+reconnect')
             results = req.search(req.prepare_search_query(args.query,
                 args.sort, args.order, args.year, args.type, args.rows))
             req.print_search_content(results, args.show_authors,
