@@ -27,8 +27,8 @@ class Validator(object):
         valid_values = [
             ('has-funder'               , self.BOOLEAN   ),
             ('funder'                   , self.FUNDER_ID ),
-            ('prefix'                   , self.MEMBER_ID ),
-            ('member'                   , self.DATE      ),
+            ('prefix'                   , self.DOI       ),
+            ('member'                   , self.MEMBER_ID ),
             ('from-index-date'          , self.DATE      ),
             ('until-index-date'         , self.DATE      ),
             ('from-deposition-date'     , self.DATE      ),
