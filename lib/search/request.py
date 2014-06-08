@@ -12,6 +12,7 @@ from lib.search.result import SearchResult
 from lib.doi import DOI
 from lib.fulltexturl import FullTextURL
 from lib.helper import Helper
+from lib.filter import Filters
 
 class Request(object):
     """
@@ -37,7 +38,7 @@ value")
         return True
 
     def prepare_search_query(self, string, sort='score', order='desc', \
-            year=None, type=None, rows=20):
+            year=None, type_=None, rows=20):
         valid_sort_methods = ('score', 'updated', 'deposited', 'indexed',
                 'published')
         if sort not in valid_sort_methods:
@@ -49,16 +50,15 @@ value")
             raise ValueError("Order method not supported. Valid values are: \
 {}".format(", ".join(valid_order_methods)))
 
-        filters = []
+        filters = Filters()
         payload = {'query': string, 'sort': sort, 'order': order, 'rows': rows}
         if year is not None:
-            filters.append(('from-pub-date', year))
-        if type is not None:
-            filters.append(('type', type))
+            filters.add('from-pub-date', year)
+        if type_ is not None:
+            filters.add('type', type_)
 
         # load all filter values
-        payload['filter'] = ','.join(['{}:{}'.format(key, value) for key, value\
-            in filters])
+        payload['filter'] = filters.get_formatted_filters()
 
         return urllib.parse.urlencode(payload)
 

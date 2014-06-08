@@ -84,6 +84,9 @@ filter list.".format(key))
         elif type_ == self.STRING:
             return type(value) == type("string")
         elif type_ == self.DATE:
+            if type(value) == type(0):
+                # convert to string if necessary
+                value = str(value)
             regex = re.compile("^\d{4}((-\d{2}){1,2})?$")
             return regex.match(value) is not None
         elif type_ == self.URL:
