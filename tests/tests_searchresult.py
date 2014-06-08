@@ -25,7 +25,7 @@ class TestResponse(unittest.TestCase):
 Bulge Types')
         self.assertEqual(res.get_year(), 0)
         self.assertEqual(res.get_authors(), 'Fabricius, Maximilian; \
-Saglia, Roberto; Drory, Niv')
+Saglia, Roberto; Drory, Niv et al.')
         self.assertEqual(res.get_type(), 'proceedings-article')
         self.assertEqual(res.get_publisher(), 'AIP')
         self.assertEqual(res.get_url(), 'http://dx.doi.org/10.1063/1.3458497')
